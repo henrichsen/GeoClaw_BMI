@@ -1,9 +1,9 @@
 import numpy as np
 import importlib.util
 import sys
+import os
 
 from bmipy import Bmi
-
 
 
 class BMI_GeoClaw(Bmi):
@@ -30,7 +30,7 @@ class BMI_GeoClaw(Bmi):
     def initialize(self,filename=None):
         #filename should be the same as setrun.py
         if filename == None:
-            pass
+            return
         elif isinstance(filename, str):
             spec = importlib.util.spec_from_file_location("setrun",filename)
             module = importlib.util.module_from_spec(spec)
@@ -38,19 +38,29 @@ class BMI_GeoClaw(Bmi):
             spec.loader.exec_module(module)
             self._model = module.setrun()
             self._model.write()
-
+            self._file_loc = ("/".join(filename.split("/")[:-1]))
+            
         else:
-            pass
-        self._values = {}
+            return
+        self._values = self._model.data_list
         self._var_units = {}
         self._var_loc ={}
         self._grids ={}
         self._grid_type ={}
             
-        pass
+        return
+    
     def update(self):
+        file=os.environ.get("CLAW")+"/clawutil/src/python/clawutil/runclaw.py"
+        spec_rc = importlib.util.spec_from_file_location("runclaw",file)
+        module_rc=importlib.util.module_from_spec(spec_rc)
+        sys.modules["runclaw"]=module_rc
+        spec_rc.loader.exec_module(module_rc)
+        module_rc.runclaw("xgeoclaw","_output",True, None, ".", False, False, None)
+       # /home/jovyan/data/GeoClaw/clawpack/clawutil/src/python/clawutil/runclaw.py xgeoclaw                  _output                True None . False False None
         pass
     def update_until(self,time = 0):
+        
         pass
     def finalize(self):
         self._model = None
