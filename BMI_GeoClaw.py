@@ -166,15 +166,13 @@ class BMI_GeoClaw(Bmi):
 
     def set_value(self, variable_name, src):
         path=variable_name.split(".")
-        if path[0]=='data_list':
-            vars(vars(self._model).get(path[0])[int(path[1])])[path[2]]=src
+        if path[0]=='data_list':    
+            setattr(getattr(self._model,path[0])[int(path[1])],path[2],src)
         elif len(path) == 1:
-            vars(self._model)[path[0]]=src
-        elif len(path) == 2:
-            vars(vars(self._model).get(path[0]))[path[1]]=src
-        elif len(path) == 3:
-            vars(vars(vars(self._model).get(path[0])).get(path[1]))[path[2]]=src
+            setattr(self._model,path[0],src)
+        elif len(path) == 2:       setattr(getattr(self._model,path[0]),path[1],src)
         self._values[variable_name]=src
+        self._model.write()
         return None
     
     def set_value_at_indices(self, variable_name, inds, src):
