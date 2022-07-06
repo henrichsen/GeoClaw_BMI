@@ -29,6 +29,11 @@ class BMI_GeoClaw(Bmi):
         
     ### Model Control Functions    
     def initialize(self,filename=None):
+        ## same as do make & make data
+        self.current_time_step=0
+        self.time_step_size=3600##define in code or read from config file
+        ##where to set current time?
+        
         #filename should be the same as setrun.py
         if filename == None:
             #todo: raise exception
@@ -70,8 +75,9 @@ class BMI_GeoClaw(Bmi):
                     if  not j[0] == "_":
                         self._values[i+"."+j]=vars(vars(self._model).get(i)).get(j)
         #define self._values end
-        self._start_time = self.get_value('data_list.0.t0')
-        self._end_time = self.get_value('data_list.0.tfinal')
+        dest=[]
+        self._start_time = self.get_value('data_list.0.t0',dest)
+        self._end_time = self.get_value('data_list.0.tfinal',dest)
         self._var_units = {}
         self._var_loc ={}
         self._grids ={}
@@ -80,18 +86,65 @@ class BMI_GeoClaw(Bmi):
         return
     
     def update(self):
+        ##same as do make data
         file=os.environ.get("CLAW")+"/clawutil/src/python/clawutil/runclaw.py"
+        print(file)
         spec_rc = importlib.util.spec_from_file_location("runclaw",file)
         module_rc=importlib.util.module_from_spec(spec_rc)
         sys.modules["runclaw"]=module_rc
         spec_rc.loader.exec_module(module_rc)
         module_rc.runclaw("xgeoclaw","_output",True, None, ".", False, False, None)
         self._current_time =self._end_time
+        ##self._current_time =self._current_time+self.time_step_size
+        
         pass
     
-    def update_until(self,time = 0):
+    def update_until(self,time):
         #todo: implement function
-        self._current_time = time
+        ##the time argument can be a non-integral multiple of time steps, and even negative
+        ##def runclaw(xclawcmd=None, outdir=None, overwrite=True, restart=None, rundir=None, print_git_status=False, nohup=False, nice=None,xclawout=None, xclawerr=None, verbose=True):
+       
+        file=os.environ.get("CLAW")+"/clawutil/src/python/clawutil/runclaw.py"
+        spec_rc = importlib.util.spec_from_file_location("runclaw",file)
+        module_rc=importlib.util.module_from_spec(spec_rc)
+        sys.modules["runclaw"]=module_rc
+        spec_rc.loader.exec_module(module_rc)  
+        
+
+        ##First time step - cold start
+        var3='clawdata.restart'
+        self.set_value(var3,False)
+        module_rc.runclaw("xgeoclaw","_output",True, None, ".", False, False, None)
+        self._current_time =self._end_time
+        self.current_time_step =self.current_time_step+1
+
+        ##time steps after first time step - restart
+        for i in range(self.current_time_step, time):
+            var3='clawdata.restart'
+            self.set_value(var3,True)
+            var4='clawdata.restart_file'
+            ##'fort.chk00006'
+
+            flist=[]
+            for fname in os.listdir(path="./_output/"):
+                if fname.startswith("fort.chk"):
+                    flist.append(fname)
+            flist.sort()
+            Restart_File=flist[-1]
+            
+            print("Restart File:\t"+Restart_File)
+            self.set_value(var4,Restart_File)
+            ##clawdata.tfinal = days2seconds(1)
+            ##print("Reset final time:\t"+str((1+i)*60*60*24))
+            self.set_value('clawdata.tfinal',(1+i)*60**2*24)
+
+            module_rc.runclaw("xgeoclaw","_output",True, True, ".", False, False, None)
+            
+            print("time step: "+str(i))##Not actual time step
+
+        ##self._current_time = time
+
+        
         pass
     
     def finalize(self):
@@ -158,7 +211,7 @@ class BMI_GeoClaw(Bmi):
         return self._time_units
         
     def get_time_step(self):
-        #return a time step of 0 if variable time steps
+        #return a time step of 0 if variable time steps##？does this mean time_step_size
         if self.get_value('data_list.0.dt_variable') == 1:
             return 0
         return self.get_value('data_list.0.dt_initial')
@@ -174,10 +227,19 @@ class BMI_GeoClaw(Bmi):
     def get_value_ptr(self, variable_name):
         return self._values[variable_name]
     
-    def get_value_at_indices(self, variable_name, dest, inds):
+##    def get_value_at_indices(self, variable_name, dest, inds):
+##        #todo throw exception
+##        dest[:] = self.get_value_ptr(variable_name).take(inds)
+##        ##Error:  'str' object has no attribute 'take'
+##        return dest
+
+    def get_value_at_indices(self, dest, inds):
         #todo throw exception
-        dest[:] = self.get_value_ptr(variable_name).take(inds)
+        dest[:] = self.get_value(self._input_var_names[inds],dest)
+        ##Error:  'str' object has no attribute 'take'
         return dest
+
+    
 
     def set_value(self, variable_name, src):
         path=variable_name.split(".")
@@ -190,12 +252,17 @@ class BMI_GeoClaw(Bmi):
         self._model.write()
         return None
     
-    def set_value_at_indices(self, variable_name, inds, src):
-        #todo throw exception
-        val =self.get_value_ptr(variable_name)
-        val.flat[inds] = src
-        return None
+##    def set_value_at_indices(self, variable_name, inds, src):
+##        #todo throw exception
+##        val =self.get_value_ptr(variable_name)
+##        val.flat[inds] = src
+##        return None
     
+    def set_value_at_indices(self, inds, src):
+        #todo throw exception
+        self.set_value(self._input_var_names[inds],src)
+        return None
+
     
     
     ##Model Grid Functions
