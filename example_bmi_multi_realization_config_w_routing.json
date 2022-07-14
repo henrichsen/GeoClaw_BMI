@@ -2,74 +2,28 @@
     "global": {
         "formulations": [
             {
-                "name": "bmi_coastal",
+                "name": "bmi_python",
                 "params": {
-                    "model_type_name": "bmi_coastal",
-                    "forcing_file": "",
-                    "init_config": "",
-                    "allow_exceed_end_time": false,
-                    "main_output_variable": "eta(Water Level Output Name)",
-                    "modules": [
-                        {
-                            "name": "bmi_python_1",
-                            "params": {
-                                "model_type_name": "bmi_python_geoclaw",
-                                "library_file": "./extern/noah-owp-modular/cmake_build/libsurfacebmi.so",
-                                "forcing_file": "",
-                                "init_config": "./setrun.py",
-                                "allow_exceed_end_time": false,
-                                "main_output_variable": "eta",
-                                "variables_names_map": {
-                                    "eta": "sea_surface_storm_water__surge_height",
-                                    "": "sea_water_flow__x_component_of_velocity",
-                                    "": "sea_water_flow__y_component_of_velocity"
-                                },
-                                "uses_forcing_file": false
-                            }
-                        },
-                        {
-                            "name": "bmi_python_2",
-                            "params": {
-                                "model_type_name": "bmi_python_cfe_with_t-route",
-                                "library_file": "./extern/cfe/cmake_build/libcfebmi.so",
-                                "forcing_file": "",
-                                "init_config": "./cat_XXX_config_cfe.json",
-                                "allow_exceed_end_time": false,
-                                "main_output_variable": "Q_OUT",
-                                "registration_function": "register_bmi_cfe",
-                                "variables_names_map": {
-                                    "channel_water_surface__elevation": "",
-                                    "channel_water_flow__x_component_of_velocity": "",
-                                    "channel_water_flow__y_component_of_velocity": "",
-                                    "channel_water_flow__speed": "",
-                                    "channel_water__mass_flow_rate": ""
-                                },
-                                "uses_forcing_file": false
-                            }
-                        }
-                    ],
-                    "uses_forcing_file": false
+                    "model_type_name": "GeoPack GeoClaw",
+                    "python_type": "BMI_GeoClaw.BMI_GeoClaw",
+                    "init_config": "./setrun.py",
+                    "uses_forcing_file": false,
+                    "main_output_variable": "output"
+
                 }
-            }
+                
+            }  
         ],
         "forcing": {
             "file_pattern": ".*{{id}}.*..csv",
-            "path": "./data/forcing/",
+            "path": "./ngen/data/forcing",
             "provider": "CsvPerFeature"
         }
     },
     "time": {
-        "start_time": "2008-12-01 00:00:00",
-        "end_time": "2008-12-30 23:00:00",
-        "output_interval": 3600
-    },
-    "routing": {
-        "t_route_connection_path": "extern/t-route/src/ngen_routing/src",
-        "t_route_config_file_with_path": "extern/t-route/test/input/yaml/ngen.yaml"
+        "start_time": "2015-12-01 00:00:00",
+        "end_time": "2015-12-02 23:00:00",
+        "output_interval": 3600 
     }
+
 }
-
-
-Question:
-1. how to setup libraries?
-2. Where to find var name for geoclaw
