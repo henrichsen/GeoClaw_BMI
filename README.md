@@ -24,7 +24,7 @@ To run the BMI in the BMI framework you will need the following files:
 ##### Setrun.py
 This file will be called in the realization file to initalize the model. An example setrun.py named `setrun_Ike.py` is in the example folder of this directory. 
 ##### Forcing File
-Forcing files are required in the Ngen Framework, even though GeoClaw does not use them. This forcing file can be used with other BMI models within the framework. An example forcing file named `forcing_example.json` can be found in the example folder of this directory.
+Forcing files are required in the Ngen Framework, even though GeoClaw does not use them. This forcing file can be used with other BMI models within the framework. An example forcing file named `forcing_example.csv` can be found in the example folder of this directory.
 ##### Catchment Files
 Catchment Files for catchments and nexuses are also required in the Ngen Framework. Just like the Forcing File, the GeoClaw BMI does not use these files, but are rather used by other BMI models. We recommend using the outlet nexus and catchment to reduce confusion. Example catchment files for both nexuses and catchments can be found in the example folder named `nexus_data` and `catchment_data` respecfully.
 ##### Realization File
