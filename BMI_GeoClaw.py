@@ -82,8 +82,6 @@ class BMI_GeoClaw(Bmi):
         return
     
     def update(self):
-        print(self.get_value("clawdata.tfinal"))
-        print(self.get_value('clawdata.checkpt_style'))
         file=os.environ.get("CLAW")+"/clawutil/src/python/clawutil/runclaw.py"
         spec_rc = importlib.util.spec_from_file_location("runclaw",file)
         module_rc=importlib.util.module_from_spec(spec_rc)
