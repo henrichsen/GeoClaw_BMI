@@ -72,7 +72,7 @@ class BMI_GeoClaw(Bmi):
         self._values["output"]=0.0
         #define self._values end
         self._start_time =  self._model.data_list[0].t0
-        self._end_time = self._model.data_list[0].tfinal
+        self._end_time = np.finfo("d").max
         self.set_value('clawdata.checkpt_style',1)
         self.set_value('clawdata.restart',False)
         self._var_units = {}
@@ -81,7 +81,7 @@ class BMI_GeoClaw(Bmi):
         self._grid_type ={}
         return
     
-    def update(self):
+    def update(self):        
         file=os.environ.get("CLAW")+"/clawutil/src/python/clawutil/runclaw.py"
         spec_rc = importlib.util.spec_from_file_location("runclaw",file)
         module_rc=importlib.util.module_from_spec(spec_rc)
@@ -100,7 +100,6 @@ class BMI_GeoClaw(Bmi):
         elif self._current_time < time:
             self.set_value("clawdata.tfinal",time)
             self.update()
-            #self.set_value("clawdata.tfinal",self._end_time)
             self._current_time= time
         else:
             #todo: implement backwards time steps
