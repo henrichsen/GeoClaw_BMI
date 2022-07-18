@@ -1,0 +1,29 @@
+{
+    "global": {
+        "formulations": [
+            {
+                "name": "bmi_python",
+                "params": {
+                    "model_type_name": "GeoPack GeoClaw",
+                    "python_type": "BMI_GeoClaw.BMI_GeoClaw",
+                    "init_config": "./Real_GeoClaw/setrun_Ike.py",
+                    "uses_forcing_file": false,
+                    "main_output_variable": "output"
+
+                }
+                
+            }  
+        ],
+        "forcing": {
+            "file_pattern": ".*{{id}}.*..csv",
+            "path": "./ngen/data/forcing",
+            "provider": "CsvPerFeature"
+        }
+    },
+    "time": {
+        "start_time": "2018-09-10 00:00:00",
+        "end_time": "2018-09-14 23:00:00",
+        "output_interval": 3600 
+    }
+
+}
