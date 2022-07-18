@@ -17,3 +17,18 @@ To run the BMI you first need to run the `init()` function. After running init, 
 
 
 ## Running in the Ngen Framework
+
+This documentation assumes that you have a working Ngen environment. For information about setting up a Ngen environment can be found on the Ngen Github page [here](https://github.com/NOAA-OWP/ngen). 
+
+To run the BMI in the BMI framework you will need the following files:
+### Setrun.py
+This file will be called in the realization file to initalize the model. An example setrun.py named `setrun_Ike.py` is in the example folder of this directory. 
+### Forcing File
+Forcing files are required in the Ngen Framework, even though GeoClaw does not use them. This forcing file can be used with other BMI models within the framework. An example forcing file named `forcing_example.json` can be found in the example folder of this directory.
+### Catchment Files
+Catchment Files for catchments and nexuses are also required in the Ngen Framework. Just like the Forcing File, the GeoClaw BMI does not use these files, but are rather used by other BMI models. We recommend using the outlet nexus and catchment to reduce confusion. Example catchment files for both nexuses and catchments can be found in the example folder named `nexus_data` and `catchment_data` respecfully.
+### Realization File
+The final file needed to run the GeoClaw BMI in the Ngen Framework is the realization file. The realization file defines how different BMIs interact with the framework and eachother. This file defines the setrun.py and forcing file for the BMI. An example Realization File can be found in the example folder named `real_example.json`.
+
+
+After setting up these files you can run the Ngen framework. This can be done by running `ngen <path to catchment forcing file> all <path to nexus forcing file> all <path to realization file>`. For example you could run the following command to run the test senerio: `ngen ./example/catchment_data.geojson all ./example/nexus_data.geojson all ./example/RealGeoClaw.json`. This will run GeoClaw BMI according to the setrun.py and end time called in the realization file. 
