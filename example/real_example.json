@@ -15,7 +15,7 @@
             }  
         ],
         "forcing": {
-            "file_pattern": ".forcing_example.csv",
+            "file_pattern": "forcing_example.csv",
             "path": "./example",
             "provider": "CsvPerFeature"
         }
