@@ -1,0 +1,28 @@
+{
+    "forcing_file":"./forcing/Forcing_Ike_Double.csv",
+    "catchment_area_km2":54.84285,
+    "alpha_fc":0.33,
+    "soil_params":{
+                   "depth":2.0,
+                   "bb":5.74313,
+                   "mult":1000.0,
+                   "satdk":0.00000566667,
+                   "satpsi":1.433908,
+                   "slop":0.053017,
+                   "smcmax":0.517497,
+                   "wltsmc":0.12655567,
+                   "D":2.0
+                   },
+    "max_gw_storage":11.93006,
+    "Cgw":0.005,
+    "expon":7.0,
+    "gw_storage":0.50,
+    "soil_storage":0.667,
+    "K_lf":0.01,
+    "K_nash":0.03,
+    "nash_storage":[0.0,0.0],
+    "giuh_ordinates":[0.1,0.35,0.2,0.14,0.1,0.06,0.05],
+    "stand_alone":1,
+    "unit_test":1,
+    "compare_results_file":"test_compare.csv"
+}
