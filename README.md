@@ -22,7 +22,7 @@ To run the BMI you first need to run the `init()` function. After running init, 
 
 To run the BMI in the BMI framework you will need the following files:
 ##### Setrun.py
-This file will be called in the realization file to initalize the model. An example setrun.py named `setrun_Ike.py` is in the example folder of this directory. 
+This file will be called in the realization file to initalize the model. An example setrun.py named `setrun_Ike.py` is in the example folder of this directory. For the variable `clawdata.t0` it is recommended to use 0 to make it easier to line up the start of the model with the forcing file, as the Ngen Framework starts models at time 0. It is also recommended to have a low `clawdata.num_output_times` as that many outputs will be created for every timestep.
 ##### Forcing File
 Forcing files are required in the Ngen Framework, even though GeoClaw does not use them. This forcing file can be used with other BMI models within the framework. An example forcing file named `forcing_example.csv` can be found in the example folder of this directory.
 ##### Catchment Files
