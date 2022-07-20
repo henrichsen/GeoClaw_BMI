@@ -87,7 +87,7 @@ subroutine src2(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt)
 
     ! river source:
 
-    if (.true.) then
+    if (.false.) then
 
         ! River
         x1rs = -94.964d0
