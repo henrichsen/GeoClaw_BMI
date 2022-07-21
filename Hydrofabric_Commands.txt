@@ -1,5 +1,5 @@
 This file has notes on commands needed to get catchment data from the Hydrofabric using 
-and R package called hyAggregate. This data is needed to run models on catchments in the Next
+an R package called hyAggregate. This data is needed to run models on catchments in the Next
 Generation National Water Model Framework, and to use the Framework's routing scheme (T-Route).
 
 An introduction to the Hydrofabric is located here: https://mikejohnson51.github.io/hyAggregate/
