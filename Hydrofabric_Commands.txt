@@ -1,0 +1,129 @@
+Use the information at this link to connect your github account to RStudio:
+https://gist.github.com/Z3tt/3dab3535007acf108391649766409421
+
+Run these commands to install all the packages you need in RStudio:
+install.packages("remotes")
+install.packages("devtools")
+install.packages("sf")
+install.packages("RSQLite")
+install.packages("rgdal")
+install.packages("RSQLite")
+install.packages("RNetCDF")
+remotes::install_github("NOAA-OWP/hyAggregate")
+remotes::install_github("USGS-R/nhdplusTools")
+remotes::install_github("r-spatial/mapview")
+library(mapview)
+library("rgdal")
+library("RSQLite")
+library("RNetCDF")
+library("devtools")
+library("sf")
+library("nhdplusTools")
+library("hyAggregate")
+
+Use these commands to get hydrofabric information:
+
+1. Set a variable to the number of the HUC region you want to download. "12" will give you the Western Gulf Coast region, including 
+   Texas and Louisiana. "01" will give you New England.
+>VPU = "12"
+
+2. Download the reference fabric:
+>get_reference_fabric(VPU = VPU, type = "refactored", dir = 'data')
+	This will print out a link, paste it into a browser to download the file.
+
+2. set a variable to the location where you stored that downloaded file (my example path included below):
+>filepath = '/Users/Abigail Sandquist/Documents/Hydrofabric/12/refactor_12.gpkg'
+
+3. Run the aggreagate network to distribution function. This will create a new aggreagted geopackage 
+   called ngen_12.gpkg in the directory you specify. My example filepath is shown in the line of code below:
+>agg = aggregate_network_to_distribution(filepath, outfile = glue::glue("C:/Users/Abigail Sandquist/Documents/Hydrofabric/data/ngen_{VPU}.gpkg"), routelink_path = get_routelink_path(), overwrite = FALSE)
+	
+4. Download the netCFD NWM file from this link: 
+   https://www.sciencebase.gov/catalog/item/requestDownload/629a4246d34ec53d276f446d?file[…]sk__b3%2F38%2F67%2Fb33867bad71477b3adbc205eb508bbd3ccfdf623
+
+5. Run the aggregate_cfe_noahowp function to a layer with CFE parameters to your geopackage. 
+   Set the directory to the same folder that your ngen_12.gpkg is stored in. 
+>agg_cfe = aggregate_cfe_noahowp(agg, dir = "C:/Users/Abigail Sandquist/Documents/Hydrofabric/data/", add_to_gpkg = TRUE)
+	
+    Output: INFO [2022-07-05 17:51:16] Building weighting grid from NETCDF:"C:/Users/Abigail Sandquist/Documents/Hydrofabric/data/ngen_gridded_data.nc":ISLTYP
+		|=========================================================================| 100%
+		SUCCESS [2022-07-05 17:53:04] Done!
+		INFO [2022-07-05 17:53:04] Getting mode: bexp, IVGTYP, ISLTYP
+		SUCCESS [2022-07-05 17:53:05] Done!
+		INFO [2022-07-05 17:53:05] Getting geometric mean: dksat, psisat
+		SUCCESS [2022-07-05 17:53:10] Done!
+		INFO [2022-07-05 17:53:10] Getting mean: slope, smcmax, smcwlt, refkdt, cwpvt, vcmx25, mp, mfsno
+		SUCCESS [2022-07-05 17:53:12] Done!
+
+You now have a geopackage with all the parameters of cfe for every catchment in HUC 12. 
+If you want to subselect a smaller region from the Hydrofabric, follow the steps below:
+
+6. Set a variable to the location of your ngen_12.gpkg.
+>gpkg = '/Users/Abigail Sandquist/Documents/Hydrofabric/data/ngen_12.gpkg' 
+
+7. Set a variable to the name of the waterbody where your desired subsection drains to. 
+   For Cedar Bayou in Galveston Bay, that value is wb-36361.
+   You can find this by opening the gpkg in ArcGIS, or you can use a function that selects
+   the nearest water body to a GPS location using the function shown in Mike Johnson's 
+   Hydrofabric trainnig video. 
+>origin = 'wb-36361'
+
+8. 
+>write_ngen_dir(gpkg)
+
+9. Run the subset_network function:
+>set = subset_network(gpkg, origin = origin)
+
+	NOTE: IF THIS DOES NOT WORK, IT IS BECAUSE SOME VARIABLES
+	IN THE FUNCTION MAY BE MISNAMED. YOU CAN CREATE YOUR OWN 
+	FUNCTION WITH THE CORRECT VARIABLE NAMES WITH THE FOLLOWING 
+	CODE:
+_______________________________________________________
+subset_net = function (gpkg, origin, mainstem = FALSE) 
+{
+  trace = get_sorted(read_sf(gpkg, "flowpath_edge_list"), 
+                     split = TRUE, outlets = origin)
+  flowpaths = filter(read_sf(gpkg, "aggregate_flowpaths"), 
+                     id %in% trace$id)
+  divides = filter(read_sf(gpkg, "aggregate_divides"), id %in% 
+                     flowpaths$realized_catchment)
+  if (mainstem) {
+    tmp = filter(flowpaths, id == origin)
+    flowpaths = filter(flowpaths, main_id == tmp$main_id)
+  }
+  return(list(flowpaths = flowpaths, divides = divides))
+}	
+____________________________________________________________
+
+	IF YOU USE THIS FUNCTION,  use subset_net() instead of 
+	subset_network() function name when running the command
+	for step 9. 
+
+10. To view your subselection in the mapviewer in R:
+>mapview::mapview(set)
+
+To write the subselected region as a layer in your geopackage, use the following commands:
+
+11. Set the name of the catchment and flowpath layers (use different names if you plan to 
+    write have multiple subselected regions in teh same geopakage):
+>flowpath_name = "subset_flowpaths"
+>catchment_name = "subset_divides"
+
+12. Assign variable names to each layer of the subset_network output
+flowpaths = set$flowpaths
+divides = set$divides
+
+13. Write the layers to the geopackage (the path to the geopakcage should still be 
+    stored under the variable name 'gpkg')
+>write_sf(flowpaths, gpkg, flowpath_name)
+>write_sf(divides, gpkg, catchment_name)
+>write_ngen_dir(gpkg, catchment_name=catchment_name, flowpath_name = flowpath_name)
+
+You should now have subselected layers added to the geopackage, and an output of all 
+the geojson and json files needed to run models on hydrofabric catchments in the ngen 
+framework with T-route. 
+
+If you want to run another subselection, change the filepath destination and run 
+steps 6-13 again. Change the 'flowpath_name' and 'catchment_name' to something else
+so that the layers for the new subselected area don't have the same name as the first
+one you ran. 
