@@ -33,3 +33,13 @@ The final file needed to run the GeoClaw BMI in the Ngen Framework is the realiz
 # Running in the Ngen Framework 
 
 After setting up the Ngen framework environment you can run the GeoClaw BMI in the terminal. This can be done by running `ngen <path to catchment forcing file> "<catchment name>" <path to nexus forcing file> "<nexus name>" <path to realization file>`. For example you could run the following command to run the test senerio: `ngen ./example/catchment_data.geojson "cat-27" ./example/nexus_data.geojson "nex-28252" ./example/RealGeoClaw.json`. This will run GeoClaw BMI according to the setrun.py and end time called in the realization file. 
+
+# Links to GeoClaw input data
+Hurricane Ike and Harvey Storm Surge Examples on the Gulf of Mexico
+
+Used Bathymetry: (avalable at https://www.hydroshare.org/resource/379b4c8c663c460d87c246641dc5cea2)
+  gulf_carribean.tt3
+  fine_galveston.tt3 (3 second resolution) https://www.ngdc.noaa.gov/mgg/coastal/crm.html
+  galveston_13_mhw_2007.tt3 (1/3 second resolution) https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/gov.noaa.ngdc.mgg.dem:403/html
+  
+ src2_rivers.f90 is GeoClaw plugin that add discharge inputs to GeoClaw model
