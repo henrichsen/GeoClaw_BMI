@@ -42,4 +42,7 @@ Used Bathymetry: (avalable at https://www.hydroshare.org/resource/379b4c8c663c46
   fine_galveston.tt3 (3 second resolution) https://www.ngdc.noaa.gov/mgg/coastal/crm.html
   galveston_13_mhw_2007.tt3 (1/3 second resolution) https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/gov.noaa.ngdc.mgg.dem:403/html
   
- src2_rivers.f90 is GeoClaw plugin that add discharge inputs to GeoClaw model
+ src2_rivers.f90 is GeoClaw plugin that add discharge inputs to GeoClaw model.This file is not needed to run the GeoClaw BMI. This plugin is included as a way to add discharge into the GeoClaw model. Adding the plugin requires changes to the Makefile, as shown in the GeoClaw_example Harvey and Ike folders. This plugin is still in development and may not be stable.
+ 
+ # CFE
+ Running the CFE BMI can be done by running the run_cfe juypter notebook. Instruction on how to run the notebook are found within the notebook itself. You can also find the output file created by the notebook in the CFE_example/output folder. 
